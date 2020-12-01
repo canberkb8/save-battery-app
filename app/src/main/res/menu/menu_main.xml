@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/installed_app"
+            android:title="Installed App" />
+        <item
+            android:id="@+id/usage_stats"
+            android:title="Usage Stats" />
+        <item
+            android:id="@+id/nav_example3"
+            android:title="example3" />
+    </group>
+</menu>
