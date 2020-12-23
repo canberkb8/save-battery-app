@@ -2,6 +2,7 @@ package com.canberkbbc.savebattery.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.net.Uri;
 import android.provider.Settings;
 import android.util.Log;
@@ -19,6 +20,7 @@ import com.canberkbbc.savebattery.databinding.CardTimeUsedListItemBinding;
 
 import java.util.List;
 
+import com.canberkbbc.savebattery.model.SaveBatteryAppData;
 import com.canberkbbc.savebattery.model.TimeUsedModel;
 
 public class TimeUsedAdapter extends RecyclerView.Adapter<TimeUsedAdapter.ViewHolderTimeUsed> {
@@ -65,11 +67,14 @@ public class TimeUsedAdapter extends RecyclerView.Adapter<TimeUsedAdapter.ViewHo
             hours   = (int) ((time / (1000*60*60)) % 24);
             days   = (int) ((time / (1000*60*60*24)) % 360);
 
-            rowBinding.txtPackageName.setText(timeUsedModel.getPackageName());
+            for (PackageInfo info : SaveBatteryAppData.getInstance().getInstalledApp()) {
+                if (info.packageName.equals(timeUsedModel.getPackageName())){
+                    rowBinding.txtAppName.setText(info.applicationInfo.loadLabel(activity.getPackageManager()).toString());
+                    rowBinding.imgAppIcon.setImageDrawable(info.applicationInfo.loadIcon(activity.getPackageManager()));
+                }
+            }
             rowBinding.txtUsedTime.setText(days + "d " + hours + "h " + minutes + "m " + seconds +"s " );
-            Log.i("adapter count", "bind: "+ getItemCount());
-
-            rowBinding.txtPackageName.setOnClickListener(new View.OnClickListener() {
+            rowBinding.cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     int version = android.os.Build.VERSION.SDK_INT;

@@ -1,23 +1,28 @@
 package com.canberkbbc.savebattery.ui;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.canberkbbc.savebattery.R;
 import com.canberkbbc.savebattery.adapter.InstalledAppAdapter;
 import com.canberkbbc.savebattery.databinding.FragmHomepageBinding;
+import com.canberkbbc.savebattery.model.SaveBatteryAppData;
 
 import java.io.File;
 import java.util.List;
@@ -39,7 +44,6 @@ public class HomeFragment extends BaseFragment {
 
         homepageBinding = DataBindingUtil.inflate(inflater, R.layout.fragm_homepage, container, false);
         view = homepageBinding.getRoot();
-
         packageManager = activity.getPackageManager();
         setInstalledAppAdapter(getInstalledAppList());
         click();
@@ -67,6 +71,7 @@ public class HomeFragment extends BaseFragment {
 
     private List<PackageInfo> getInstalledAppList() {
         List<PackageInfo> infos = packageManager.getInstalledPackages(0);
+        SaveBatteryAppData.getInstance().setInstalledApp(infos);
         return infos;
     }
 
@@ -80,6 +85,7 @@ public class HomeFragment extends BaseFragment {
         });
     }
 
+
     //clear cache
     public static void deleteCache(Context context) {
         try {
@@ -90,7 +96,6 @@ public class HomeFragment extends BaseFragment {
         } catch (Exception e) {
         }
     }
-
     public static boolean deleteDir(File dir) {
         if (dir != null && dir.isDirectory()) {
             String[] children = dir.list();

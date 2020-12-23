@@ -1,31 +1,24 @@
 package com.canberkbbc.savebattery;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.databinding.DataBindingUtil;
-import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
-import androidx.navigation.NavDestination;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Switch;
 
 import com.canberkbbc.savebattery.databinding.ActivityMainBinding;
-import com.canberkbbc.savebattery.ui.HomeFragment;
 import com.google.android.material.navigation.NavigationView;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-    View view;
     ActivityMainBinding mainBinding;
     NavController navController;
 
@@ -55,15 +48,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         switch (item.getItemId()) {
             case R.id.installed_app:
                 changeFragment(R.id.homePageFragment);
-                Log.i("TAG", "onNavigationItemSelected: case installed_app");
+                Log.i("TAG", "onNavigationItemSelected: case homePageFragment");
                 break;
             case R.id.usage_stats:
                 changeFragment(R.id.timeUsedFragment);
-                Log.i("TAG", "onNavigationItemSelected: case usage_stats");
+                Log.i("TAG", "onNavigationItemSelected: case timeUsedFragment");
                 break;
-            case R.id.nav_example3:
-                //changeFragment(R.id.homePageFragment);
-                Log.i("TAG", "onNavigationItemSelected: case nav_example3");
+            case R.id.usage_network:
+                changeFragment(R.id.networkUsedFragment);
+                Log.i("TAG", "onNavigationItemSelected: case networkUsedFragment");
+                break;
+            case R.id.battery_stats:
+                changeFragment(R.id.batteryStatsFragment);
+                Log.i("TAG", "onNavigationItemSelected: case batteryStatsFragment");
                 break;
             default:
                 break;

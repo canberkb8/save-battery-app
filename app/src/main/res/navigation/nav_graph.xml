@@ -14,4 +14,14 @@
         android:name="com.canberkbbc.savebattery.ui.TimeUsedFragment"
         android:label="TimeUsedFragment" />
 
+    <fragment
+        android:id="@+id/networkUsedFragment"
+        android:name="com.canberkbbc.savebattery.ui.NetworkUsedFragment"
+        android:label="NetworkUsedFragment" />
+
+    <fragment
+        android:id="@+id/batteryStatsFragment"
+        android:name="com.canberkbbc.savebattery.ui.BatteryStatsFragment"
+        android:label="BatteryStatsFragment" />
+
 </navigation>

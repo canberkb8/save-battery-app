@@ -54,10 +54,6 @@ public class InstalledAppAdapter extends RecyclerView.Adapter<InstalledAppAdapte
             rowBinding.txtTitle.setText(installedApp.applicationInfo.loadLabel(activity.getPackageManager()).toString());
             rowBinding.txtLastUsed.setText(installedApp.versionName);
             rowBinding.imgAppIcon.setImageDrawable(installedApp.applicationInfo.loadIcon(activity.getPackageManager()));
-            //Log.i("sharedUserId", "sharedUserId: " +installedApp.sharedUserId);
-            //Log.i("applicationInfo", "applicationInfo: " +installedApp.applicationInfo);
-            //Log.i("firstInstallTime", "firstInstallTime: " +installedApp.firstInstallTime);
-            //Log.i("permissions", "permissions: " +installedApp.permissions);
         }
     }
 }
