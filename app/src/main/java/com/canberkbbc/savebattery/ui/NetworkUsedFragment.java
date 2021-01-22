@@ -1,13 +1,19 @@
 package com.canberkbbc.savebattery.ui;
 
+import android.Manifest;
+import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.pm.ApplicationInfo;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkInfo;
-import android.net.TrafficStats;
+import android.net.nsd.NsdServiceInfo;
+import android.net.wifi.ScanResult;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,22 +22,41 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.core.app.ActivityCompat;
 import androidx.databinding.DataBindingUtil;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.canberkbbc.savebattery.MainActivity;
 import com.canberkbbc.savebattery.R;
+import com.canberkbbc.savebattery.adapter.InstalledAppAdapter;
+import com.canberkbbc.savebattery.adapter.NetworkAdapter;
 import com.canberkbbc.savebattery.databinding.FragmNetworkusedBinding;
+import com.canberkbbc.savebattery.model.SaveBatteryAppData;
+import com.canberkbbc.savebattery.utils.NsdHelper;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 
 public class NetworkUsedFragment extends BaseFragment {
     View view;
     private FragmNetworkusedBinding networkusedBinding;
-
-    private static final String DEBUG_TAG = "NetworkStatusExample";
     private ConnectivityManager connMgr;
+    private WifiManager wifiManager;
+    private WifiInfo info;
+    private NsdHelper mNsdHelper;
+    private final int NSDCHAT_PORT = 9000;
+
+    public int speed = 0;
+    public String ssid,bssid,macAddress,netmaskIp,gatewayIp = null;
+
+    String[] PERMS_INITIAL = {
+            Manifest.permission.ACCESS_FINE_LOCATION,
+    };
+
+    List<ScanResult> results = new ArrayList<>();
+    private NetworkAdapter networkAdapter;
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -39,15 +64,112 @@ public class NetworkUsedFragment extends BaseFragment {
         view = networkusedBinding.getRoot();
 
         connMgr = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
+        wifiManager = (WifiManager) activity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 
+        getWifiInfo();
         checkNetworkConnetion();
-        Log.i("isOnline", "isOnline: " +isOnline());
+        scanWifiReceiver();
+        createNsdHelper();
+        setView();
+
 
         return view;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mNsdHelper != null) {
+            mNsdHelper.initializeNsd();
+            mNsdHelper.registerService(NSDCHAT_PORT);
+        }
+    }
+
+    void createNsdHelper(){
+        mNsdHelper = new NsdHelper(activity);
+        mNsdHelper.initializeNsd();
+        mNsdHelper.registerService(NSDCHAT_PORT);
+        mNsdHelper.discoverServices();
+    }
+
+    void setView(){
+        networkusedBinding.txtDeviceName.setText(getDeviceName());
+        networkusedBinding.txtPortnumber.setText("Port Number : "+ SaveBatteryAppData.getInstance().getPortNumber());
+        networkusedBinding.txtConnectionMobile.setText("Mobile Connection : "+ isOnline());
+    }
+
+
+    //Wifi alanımızdaki wifilerin listesi ve bilgileri
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    private void scanWifiReceiver() {
+        ActivityCompat.requestPermissions(activity, PERMS_INITIAL, 127);
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
+        BroadcastReceiver wifiScanReceiver = new BroadcastReceiver() {
+            @RequiresApi(api = Build.VERSION_CODES.M)
+            @Override
+            public void onReceive(Context c, Intent intent) {
+                boolean success = intent.getBooleanExtra(
+                        WifiManager.EXTRA_RESULTS_UPDATED, false);
+                if (success) {
+                    scanSuccess();
+                } else {
+                    scanFailure();
+                }
+            }
+        };
+        activity.registerReceiver(wifiScanReceiver, intentFilter);
+        boolean success = wifiManager.startScan();
+        if (!success) {
+            scanFailure();
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    private void scanSuccess() {
+        if (results != null) {
+            results.clear();
+        }
+        results = wifiManager.getScanResults();
+        setNetworkAdapter(results);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    private void scanFailure() {
+        results = wifiManager.getScanResults();
+    }
+
+    private void setNetworkAdapter(List<ScanResult> wifiList) {
+        networkAdapter = new NetworkAdapter(activity, wifiList);
+        networkusedBinding.recyclerWifi.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
+        networkusedBinding.recyclerWifi.setHasFixedSize(true);
+        networkusedBinding.recyclerWifi.setAdapter(networkAdapter);
+    }
+
+    public String getDeviceName() {
+        String manufacturer = Build.MANUFACTURER;
+        String model = Build.MODEL;
+        if (model.startsWith(manufacturer)) {
+            return capitalize(model);
+        } else {
+            return capitalize(manufacturer) + " " + model;
+        }
+    }
+
+    private String capitalize(String s) {
+        if (s == null || s.length() == 0) {
+            return "";
+        }
+        char first = s.charAt(0);
+        if (Character.isUpperCase(first)) {
+            return s;
+        } else {
+            return Character.toUpperCase(first) + s.substring(1);
+        }
+    }
+
     //Wifi nin açık olup olmadını ve telefonun baglı olup olmadıgını donurur.
-    private void checkNetworkConnetion(){
+    private void checkNetworkConnetion() {
         boolean isWifiConn = false;
         boolean isMobileConn = false;
         for (Network network : connMgr.getAllNetworks()) {
@@ -59,8 +181,6 @@ public class NetworkUsedFragment extends BaseFragment {
                 isMobileConn |= networkInfo.isConnected();
             }
         }
-        Log.d(DEBUG_TAG, "Wifi connected: " + isWifiConn);
-        Log.d(DEBUG_TAG, "Mobile connected: " + isMobileConn);
     }
 
     //Telefon internete bağlı olup olmadığını döndürür.
@@ -69,50 +189,28 @@ public class NetworkUsedFragment extends BaseFragment {
         return (networkInfo != null && networkInfo.isConnected());
     }
 
-    //network kullanımı deneme fonksıyonları
-    public void getAllAppList() {
-
-        PackageManager p = activity.getPackageManager();
-        List<ApplicationInfo> packages = p.getInstalledApplications(PackageManager.GET_META_DATA);
-
-        for (ApplicationInfo applicationInfo : packages) {
-            try {
-                PackageInfo packageInfo = p.getPackageInfo(applicationInfo.packageName, PackageManager.GET_PERMISSIONS);
-                String[] permissions = packageInfo.requestedPermissions;
-                if (permissions != null) {
-                    for (String permissionName : permissions) {
-                        if (permissionName.equals("android.permission.INTERNET")) {
-                            ApplicationInfo appInfo = packageInfo.applicationInfo;
-                            Log.i("getApplicationIcon", "getApplicationIcon: " + activity.getPackageManager().getApplicationIcon(appInfo));
-                            Log.i("getApplicationLabel", "getApplicationLabel: " + activity.getPackageManager().getApplicationLabel(appInfo));
-                            Log.i("getDataUsage", "getDataUsage: " + getDataUsage(appInfo));
-                            Log.i("permissionName", "permissionName: " + permissionName);
-                            Log.i("permissionsList", "permissionsList: " + Arrays.toString(permissions));
-                            Log.i("getApplicationLabel", "getApplicationLabel: " + activity.getPackageManager().getApplicationLabel(appInfo));
-                            Log.i("getDataUsage", "getDataUsage: " + getDataUsage(appInfo));
-                            Log.i("permissionsList", "permissionsList: " + Arrays.toString(permissions));
-                        }
-                    }
-                }
-            } catch (PackageManager.NameNotFoundException e) {
-                e.printStackTrace();
-            }
+    public boolean getWifiInfo() {
+        WifiManager wifi = (WifiManager) activity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        if (wifi != null) {
+            info = wifi.getConnectionInfo();
+            speed = info.getLinkSpeed();
+            ssid = info.getSSID();
+            bssid = info.getBSSID();
+            macAddress = info.getMacAddress();
+            gatewayIp = getIpFromIntSigned(wifi.getDhcpInfo().gateway);
+            netmaskIp = getIpFromIntSigned(wifi.getDhcpInfo().netmask);
+            return true;
         }
+        return false;
     }
-    public String getDataUsage(ApplicationInfo appInfo) {
 
-        int uid = appInfo.uid;
-        Log.i("getUidRxBytes", "getUidRxBytes: " + (double) TrafficStats.getUidRxBytes(uid) / (1024 * 1024));
-        Log.i("getUidTxBytes", "getUidTxBytes: " + (double) TrafficStats.getUidTxBytes(uid) / (1024 * 1024));
-        Log.i("getUidRxPackets", "getUidRxPackets: " + (double) TrafficStats.getUidRxPackets(uid) / (1024 * 1024));
-        Log.i("getUidTxPackets", "getUidTxPackets: " + (double) TrafficStats.getUidTxPackets(uid) / (1024 * 1024));
-
-        double received = (double) TrafficStats.getUidRxBytes(uid) / (1024 * 1024);
-        double sent = (double) TrafficStats.getUidTxBytes(uid) / (1024 * 1024);
-
-        double total = received + sent;
-
-        return String.format("%.2f", total) + " MB";
-
+    public static String getIpFromIntSigned(int ip_int) {
+        String ip = "";
+        for (int k = 0; k < 4; k++) {
+            ip = ip + ((ip_int >> k * 8) & 0xFF) + ".";
+        }
+        return ip.substring(0, ip.length() - 1);
     }
+
 }
+

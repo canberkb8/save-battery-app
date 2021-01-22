@@ -1,27 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
     app:startDestination="@id/homePageFragment">
 
     <fragment
         android:id="@+id/homePageFragment"
         android:name="com.canberkbbc.savebattery.ui.HomeFragment"
-        android:label="HomePageFragment" />
+        android:label="HomePageFragment"
+        tools:layout="@layout/fragm_homepage"/>
 
     <fragment
         android:id="@+id/timeUsedFragment"
         android:name="com.canberkbbc.savebattery.ui.TimeUsedFragment"
-        android:label="TimeUsedFragment" />
+        android:label="TimeUsedFragment"
+        tools:layout="@layout/fragm_timeused"/>
 
     <fragment
         android:id="@+id/networkUsedFragment"
         android:name="com.canberkbbc.savebattery.ui.NetworkUsedFragment"
-        android:label="NetworkUsedFragment" />
+        android:label="NetworkUsedFragment"
+        tools:layout="@layout/fragm_networkused"/>
 
     <fragment
         android:id="@+id/batteryStatsFragment"
         android:name="com.canberkbbc.savebattery.ui.BatteryStatsFragment"
-        android:label="BatteryStatsFragment" />
+        android:label="BatteryStatsFragment"
+        tools:layout="@layout/fragm_batterystats"/>
+
+    <fragment
+        android:id="@+id/infoFragment"
+        android:name="com.canberkbbc.savebattery.ui.InfoFragment"
+        android:label="InfoFragment"
+        tools:layout="@layout/fragm_info">
+        <action
+            android:id="@+id/action_infoFragment_to_infoDetail"
+            app:destination="@id/infoDetail" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/infoDetail"
+        android:name="com.canberkbbc.savebattery.ui.InfoDetailFragment"
+        android:label="InfoDetail"
+        tools:layout="@layout/fragm_info_detail">
+    </fragment>
 
 </navigation>

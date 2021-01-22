@@ -12,49 +12,83 @@
         android:layout_height="match_parent">
 
         <TextView
-            android:id="@+id/textView"
+            android:id="@+id/txt_charge_percentage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="172dp"
-            android:text="TextView"
+            android:text="Charge Percentage"
             android:textSize="20sp"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="@+id/img_battery"
+            app:layout_constraintEnd_toStartOf="@+id/img_battery"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/img_battery" />
+
+        <ImageView
+            android:id="@+id/img_battery"
+            android:layout_width="150dp"
+            android:layout_height="200dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/textView2"
+            android:id="@+id/txt_temp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
-            android:text="TextView"
+            android:text="Temperature"
             android:textSize="20sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView" />
+            app:layout_constraintEnd_toEndOf="@+id/txt_charge_percentage"
+            app:layout_constraintStart_toStartOf="@+id/txt_charge_percentage"
+            app:layout_constraintTop_toBottomOf="@+id/img_battery" />
 
         <TextView
-            android:id="@+id/textView3"
+            android:id="@+id/txt_charge_status"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="TextView"
             android:layout_marginTop="32dp"
+            android:text="ChargeStatus"
             android:textSize="20sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.498"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView2" />
+            app:layout_constraintStart_toStartOf="@+id/txt_temp"
+            app:layout_constraintTop_toBottomOf="@+id/txt_temp" />
 
         <TextView
-            android:id="@+id/textView4"
+            android:id="@+id/txt_voltage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="TextView"
             android:layout_marginTop="32dp"
+            android:text="Voltage"
             android:textSize="20sp"
+            app:layout_constraintStart_toStartOf="@+id/txt_charge_status"
+            app:layout_constraintTop_toBottomOf="@+id/txt_charge_status" />
+
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_clear_cache"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/button"
+            android:hint="Clear Cache"
+            android:padding="10dp"
+            android:textColor="@color/black"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_speed"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/button"
+            android:hint="Speed"
+            android:padding="10dp"
+            android:textColor="@color/black"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.498"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView3" />
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toEndOf="@+id/btn_clear_cache" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -18,7 +18,21 @@ public class SaveBatteryAppData {
     public List<PackageInfo> getInstalledApp(){
         return installedApp;
     }
-    public void setInstalledApp(List<PackageInfo> installedApp){
-        this.installedApp = installedApp;
+    public void setInstalledApp(List<PackageInfo> installedApp){ this.installedApp = installedApp; }
+
+    private InfoModel infoModel;
+    public InfoModel getInfoModel(){
+        return infoModel;
+    }
+    public void setInfoModel(InfoModel infoModel){
+        this.infoModel = infoModel;
+    }
+
+    private int portNumber;
+    public int getPortNumber(){
+        return portNumber;
+    }
+    public void setPortNumber(int portNumber){
+        this.portNumber = portNumber;
     }
 }

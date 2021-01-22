@@ -1,7 +1,6 @@
 package com.canberkbbc.savebattery.adapter;
 
 import android.content.pm.PackageInfo;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 

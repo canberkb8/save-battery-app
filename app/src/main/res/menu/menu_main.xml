@@ -14,5 +14,8 @@
         <item
             android:id="@+id/battery_stats"
             android:title="Battery Stats" />
+        <item
+            android:id="@+id/info_page"
+            android:title="Info" />
     </group>
 </menu>
